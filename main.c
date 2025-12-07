@@ -2,7 +2,7 @@
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-
+#include <custom/shader.h>
 #include <stdio.h>
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
@@ -52,7 +52,7 @@ int main()
 
     // glad: load all OpenGL function pointers
     // ---------------------------------------
-    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
+        if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
     {
         printf("Failed to initialize GLAD" );
         return -1;
@@ -62,42 +62,61 @@ int main()
     // build and compile our shader program
     // ------------------------------------
     // vertex shader
-    unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
-    glCompileShader(vertexShader);
-    // check for shader compile errors
+    // unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
+    // glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
+    // glCompileShader(vertexShader);
+    // // check for shader compile errors
     int success;
     char infoLog[512];
-    glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-    if (!success)
-    {
-        glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-        printf("ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" );
-    }
-    // fragment shader
-    unsigned int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
-    glCompileShader(fragmentShader);
-    // check for shader compile errors
-    glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
-    if (!success)
-    {
-        glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
-        printf("ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" );
-    }
-    // link shaders
-    unsigned int shaderProgram = glCreateProgram();
-    glAttachShader(shaderProgram, vertexShader);
-    glAttachShader(shaderProgram, fragmentShader);
-    glLinkProgram(shaderProgram);
+    // glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
+    // if (!success)
+    // {
+    //     glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
+    //     printf("ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" );
+    // }
+    // // fragment shader
+    // unsigned int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+    // glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
+    // glCompileShader(fragmentShader);
+    // // check for shader compile errors
+    // glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
+    // if (!success)
+    // {
+    //     glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
+    //     printf("ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" );
+    // }
+    // // link shaders
+    // unsigned int shaderProgram = glCreateProgram();
+    // glAttachShader(shaderProgram, vertexShader);
+    // glAttachShader(shaderProgram, fragmentShader);
+    // glLinkProgram(shaderProgram);
+    // // check for linking errors
+    // glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
+    // if (!success) {
+    //     glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
+    //     printf("ERROR::SHADER::PROGRAM::LINKING_FAILED\n");
+    // }
+    // glDeleteShader(vertexShader);
+    // glDeleteShader(fragmentShader);
+    struct shaderContext* a = CreateContext();
+    vShader(a,"/home/ayush/Documents/C/opengl-1/data/shader/vertex.vs");
+    fShader(a,"/home/ayush/Documents/C/opengl-1/data/shader/fragment.fs");
+    enableShaderContext(a);
+    glLinkProgram(a->program);
     // check for linking errors
-    glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
+    glGetShaderiv(a->fragmentShader, GL_COMPILE_STATUS, &success);
+    if (!success)
+    {
+        glGetShaderInfoLog(a->fragmentShader, 512, NULL, infoLog);
+        printf("ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n %s",infoLog );
+    }
+
+
+    glGetProgramiv(a->program, GL_LINK_STATUS, &success);
     if (!success) {
-        glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
+        glGetProgramInfoLog(a->program, 512, NULL, infoLog);
         printf("ERROR::SHADER::PROGRAM::LINKING_FAILED\n");
     }
-    glDeleteShader(vertexShader);
-    glDeleteShader(fragmentShader);
 
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------
@@ -155,7 +174,7 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT);
 
         // draw our first triangle
-        glUseProgram(shaderProgram);
+        enableShaderContext(a);
         glBindVertexArray(VAO); // seeing as we only have a single VAO there's no need to bind it every time, but we'll do so to keep things a bit more organized
         //glDrawArrays(GL_TRIANGLES, 0, 6);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
@@ -172,8 +191,7 @@ int main()
     glDeleteVertexArrays(1, &VAO);
     glDeleteBuffers(1, &VBO);
     glDeleteBuffers(1, &EBO);
-    glDeleteProgram(shaderProgram);
-
+    DeleteShaderContext(a);
     // glfw: terminate, clearing all previously allocated GLFW resources.
     // ------------------------------------------------------------------
     glfwTerminate();
