@@ -21,7 +21,7 @@
                     "value": "Debug"
                 }
             ],
-            "launchCompleteCommand": "exec-run",
+            
             "logging": {
                 "moduleLoad": true,
                 "trace": false
