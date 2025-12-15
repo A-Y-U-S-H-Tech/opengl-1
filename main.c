@@ -3,7 +3,10 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <custom/shader.h>
+#include <custom/loger.h>
+#include <string.h>
 #include <stdio.h>
+
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow *window);
@@ -30,8 +33,8 @@ int main()
     // glfw: initialize and configure
     // ------------------------------
     glfwInit();
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 4);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
 #ifdef __APPLE__
@@ -99,24 +102,10 @@ int main()
     // glDeleteShader(vertexShader);
     // glDeleteShader(fragmentShader);
     struct shaderContext* a = CreateContext();
+
     vShader(a,"/home/ayush/Documents/C/opengl-1/data/shader/vertex.vs");
     fShader(a,"/home/ayush/Documents/C/opengl-1/data/shader/fragment.fs");
     enableShaderContext(a);
-    glLinkProgram(a->program);
-    // check for linking errors
-    glGetShaderiv(a->fragmentShader, GL_COMPILE_STATUS, &success);
-    if (!success)
-    {
-        glGetShaderInfoLog(a->fragmentShader, 512, NULL, infoLog);
-        printf("ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n %s",infoLog );
-    }
-
-
-    glGetProgramiv(a->program, GL_LINK_STATUS, &success);
-    if (!success) {
-        glGetProgramInfoLog(a->program, 512, NULL, infoLog);
-        printf("ERROR::SHADER::PROGRAM::LINKING_FAILED\n");
-    }
 
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------
@@ -162,6 +151,7 @@ int main()
 
     // render loop
     // -----------
+    enableShaderContext(a);
     while (!glfwWindowShouldClose(window))
     {
         // input
@@ -174,7 +164,7 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT);
 
         // draw our first triangle
-        enableShaderContext(a);
+        
         glBindVertexArray(VAO); // seeing as we only have a single VAO there's no need to bind it every time, but we'll do so to keep things a bit more organized
         //glDrawArrays(GL_TRIANGLES, 0, 6);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);

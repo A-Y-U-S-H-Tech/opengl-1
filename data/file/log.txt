@@ -1,0 +1,7 @@
+0:6(1): error: syntax error, unexpected '}', expecting ',' or ';'
+
+error: linking with uncompiled/unspecialized shader
+error: linking with uncompiled/unspecialized shader
+
+error: linking with uncompiled/unspecialized shader
+error: linking with uncompiled/unspecialized shader

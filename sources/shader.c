@@ -3,11 +3,21 @@
 #include <stdlib.h>
 #include <glad/glad.h>
 #include <string.h>
+#include <custom/loger.h>
 
 char* fileload(const char* name)
 {
     FILE *ptr;
     ptr = fopen(name,"r");
+    if(ptr == NULL)
+    {
+        strcpy(logbuff,"\n the file could not be opended file name: ");
+        strcat(logbuff,name);
+        strcat(logbuff,"\n");
+        logFileAppend();
+        consoleLog();
+        exit(1);
+    }
     char *file = malloc(sizeof(char)*400);
     int bitsread = fread((void *)file,sizeof(char),400,ptr);
     file[bitsread]='\0';
@@ -19,6 +29,7 @@ void vShader(struct shaderContext* context,char* shaderfile)
     const char *temp = fileload(shaderfile);
     glShaderSource(context->vertexShader,1,&temp,NULL);
     glCompileShader(context->vertexShader);
+    shaderChecker(context->vertexShader);
     free(temp);
 }
 void fShader(struct shaderContext* context,char* shaderfile)
@@ -26,6 +37,7 @@ void fShader(struct shaderContext* context,char* shaderfile)
     const char *temp = fileload(shaderfile);
     glShaderSource(context->fragmentShader,1,&temp,NULL);
     glCompileShader(context->fragmentShader);
+    shaderChecker(context->fragmentShader);
     free(temp);
 }
 void enableShaderContext(struct shaderContext * context)
@@ -33,6 +45,7 @@ void enableShaderContext(struct shaderContext * context)
     glAttachShader(context->program,context->fragmentShader);
     glAttachShader(context->program,context->vertexShader);
     glLinkProgram(context->program);
+    programChecker(context->program);
     glUseProgram(context->program);
 }
 void DeleteShaderContext(struct shaderContext* context)
