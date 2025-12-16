@@ -16,6 +16,7 @@ char* fileload(const char* name)
         strcat(logbuff,"\n");
         logFileAppend();
         consoleLog();
+        logbuff[0]='\0';
         exit(1);
     }
     char *file = malloc(sizeof(char)*400);

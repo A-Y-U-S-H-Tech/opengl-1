@@ -49,6 +49,7 @@ void shaderChecker(unsigned int shader)
         strcat(logbuff,"\n");
         consoleLog();
         logFileAppend();
+        logbuff[0]='\0';
     }
 }
 

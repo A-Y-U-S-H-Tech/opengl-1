@@ -1,7 +1,16 @@
-0:6(1): error: syntax error, unexpected '}', expecting ',' or ';'
 
-error: linking with uncompiled/unspecialized shader
-error: linking with uncompiled/unspecialized shader
+ the file could not be opended file name: data/shader/vertex.vs
 
-error: linking with uncompiled/unspecialized shader
-error: linking with uncompiled/unspecialized shader
+ the file could not be opended file name: data/shader/vertex.vs
+
+ the file could not be opended file name: data/shader/vertex.vs
+
+ the file could not be opended file name: data/shader/vertex.vs
+
+ the file could not be opended file name: data/shader/vertex.vs
+
+ the file could not be opended file name: data/shader/vertex.vs
+
+ the file could not be opended file name: data/shader/vertex.vs
+
+ the file could not be opended file name: data/shader/vertex.vs
