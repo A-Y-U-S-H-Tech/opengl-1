@@ -2,16 +2,19 @@
 #include <custom/loger.h>
 #include <string.h>
 #include <glad/glad.h>
+#include <stdio.h>
 
-void initiliseVertexContext(struct vertexContext* context,GLsizeiptr size,const void* data,GLenum usage,void (*callback)(struct vertexContext*))
+void initiliseVertexContext(struct vertexContext* context,GLsizeiptr size,const void* data,GLenum usage,void (*callback)(struct vertexContext*),int indicesSize,void* dataIndice)
 {
+    fflush(stdout);  
     strcpy(logbuff,"\n the vertex Context creation has started\n");
     consoleLog();
     initiliseVAO(context);
+    enableVertextContext(context);
     initiliseVBO(context,size,data,usage);
     initiliseVertexAttribiute(callback,context);
-    initiliseEBO(context);
-    enableVertextContext(context);
+    initiliseEBO(context,indicesSize,dataIndice);
+    glBindBuffer(GL_ARRAY_BUFFER,0);
     strcpy(logbuff,"\n the vertex Context has been created\n");
     consoleLog();
     logbuff[0]='\0';
@@ -30,14 +33,16 @@ static void initiliseVBO(struct vertexContext* context,GLsizeiptr size,const voi
     consoleLog();
     glGenBuffers(1,&context->VBO);
     glBindBuffer(GL_ARRAY_BUFFER,context->VBO);
-    glBufferData(context->VBO,size,data,usage);
-    glBindVertexArray(0);
+    glBufferData(GL_ARRAY_BUFFER,size,data,usage);
     strcpy(logbuff,"\n the vertex Buffer Object creation has ended\n");
     consoleLog();
 
 }
-static void initiliseEBO(struct vertexContext* context)
+static void initiliseEBO(struct vertexContext* context,int size,void * data)
 {
+    glGenBuffers(1, &(context->EBO));
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, context->EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, size, data, GL_STATIC_DRAW);
 
 }
 static void initiliseVertexAttribiute(void (*callback)(struct vertexContext*),struct vertexContext* context)

@@ -18,14 +18,15 @@ void logFileAppend()
     if(ptr == NULL)
     {
         consoleLogLogerError("the file couldn't be opened\n");
-        exit(1);
+        exit(2);
+        
     }
     fputs(logbuff,ptr);
     fclose(ptr);
 }
 void consoleLog()
 {
-    printf("[TIME] [STATUS] : %s",logbuff);
+    printf("[TIME] [STATUS] : %s\n",logbuff);
 }
 void gllog()
 {
@@ -36,6 +37,13 @@ void gllog()
         strcat(logbuff,"\n");
         consoleLog();
         logFileAppend();
+    }
+    temp = glGetError();
+    if(temp != 0)
+    {
+        snprintf(logbuff,500,"\nthere is an error in opengl code with error code : %d\n",temp);
+        consoleLog();
+        logbuff[0]='\0';
     }
 }
 

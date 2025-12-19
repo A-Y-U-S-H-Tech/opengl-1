@@ -47,6 +47,9 @@ void enableShaderContext(struct shaderContext * context)
     glAttachShader(context->program,context->vertexShader);
     glLinkProgram(context->program);
     programChecker(context->program);
+}
+void useShaderContext(struct shaderContext* context)
+{
     glUseProgram(context->program);
 }
 void DeleteShaderContext(struct shaderContext* context)
