@@ -4,7 +4,7 @@ header = ./headers
 library =  -lglfw -lm 
 
 main:$(objectfile)/main.o $(objectfile)/glad.o $(objectfile)/shader.o $(objectfile)/loger.o $(objectfile)/vertex.o $(objectfile)/grid.o
-	gcc  $(objectfile)/glad.o $(objectfile)/loger.o $(objectfile)/vertex.o $(objectfile)/grid.o $(objectfile)/shader.o $(objectfile)/main.o $ -o main $(library)
+	gcc  $(objectfile)/glad.o $(objectfile)/loger.o $(objectfile)/vertex.o $(objectfile)/grid.o $(objectfile)/shader.o $(objectfile)/main.o $ -g -o main $(library)
 
 $(objectfile)/glad.o:$(Source)/glad.c
 	gcc -c -I./headers  -g $(Source)/glad.c -o $(objectfile)/glad.o

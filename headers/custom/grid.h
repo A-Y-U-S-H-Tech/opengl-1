@@ -1,3 +1,4 @@
+#include <custom/vertex.h>
 struct textureCoordOfCell
 {
     struct vec2
@@ -37,6 +38,10 @@ struct Grid
     struct Cell* cells;
     int numberOfCells;
     unsigned int* indices;
+    struct Cell * fristIndexPointer //this exits soley for gpu side buffer estimation this shall not be used to do  anything cpu sided
 };
 
-struct Grid* CreateGrid(float width,float height,float cellHeight,float cellWidth);
+const struct Grid* CreateGrid(float width,float height,float cellHeight,float cellWidth);
+void SetCell(const struct Grid* grid,const struct textureCoordOfCell texCoord,const unsigned int);
+void gridUpdate(struct vertexContext* context,const struct Grid* grid,unsigned int cellNO);
+void GridTerminate(const struct Grid* grid);

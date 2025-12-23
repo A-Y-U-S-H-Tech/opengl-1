@@ -4,7 +4,7 @@
 #include <glad/glad.h>
 #include <stdlib.h>
 char logbuff[525];
-const char defaultfile[]="../data/file/log.txt";
+const char defaultfile[]="data/file/log.txt";
 
 void consoleLogLogerError(char * data)
 {
@@ -13,16 +13,15 @@ void consoleLogLogerError(char * data)
 
 void logFileAppend()
 {
-    FILE* ptr;
-    ptr = fopen(defaultfile,"a+");
-    if(ptr == NULL)
+    fileptr = fopen(defaultfile,"a+");
+    if(fileptr == NULL)
     {
         consoleLogLogerError("the file couldn't be opened\n");
         exit(2);
         
     }
-    fputs(logbuff,ptr);
-    fclose(ptr);
+    fputs(logbuff,fileptr);
+    fflush(fileptr);
 }
 void consoleLog()
 {
@@ -31,13 +30,6 @@ void consoleLog()
 void gllog()
 {
     int temp;
-    temp = glGetDebugMessageLog(2,500,NULL,NULL,NULL,NULL,NULL,logbuff);
-    if(logbuff[0] != '\0')
-    {
-        strcat(logbuff,"\n");
-        consoleLog();
-        logFileAppend();
-    }
     temp = glGetError();
     if(temp != 0)
     {

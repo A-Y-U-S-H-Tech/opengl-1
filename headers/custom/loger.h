@@ -1,8 +1,11 @@
 /*
 this defines  logging tools for both the program and opengl functions
 */
+#include <stdio.h>
+
 extern char logbuff[];//buffer to store the log message
 extern const char defaultfile[];//file to store the logs in
+static FILE* fileptr;
 
 void logFileAppend();//appends the log file with error logs
 void gllog();//gets any gl eror if eror the appends the log file via logFileAppend

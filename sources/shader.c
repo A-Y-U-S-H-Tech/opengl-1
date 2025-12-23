@@ -27,36 +27,80 @@ char* fileload(const char* name)
 }
 void vShader(struct shaderContext* context,char* shaderfile)
 {
+    int glError=0;
     const char *temp = fileload(shaderfile);
     glShaderSource(context->vertexShader,1,&temp,NULL);
+    glError = glGetError();
     glCompileShader(context->vertexShader);
+    glError = glGetError();
+    if(glError != 0) 
+    {
+        strcpy(logbuff,"\n the vertex shader initilization has failed \n");
+        consoleLog();
+        logFileAppend();
+    }
     shaderChecker(context->vertexShader);
     free(temp);
 }
 void fShader(struct shaderContext* context,char* shaderfile)
 {
+    int glError=0;
     const char *temp = fileload(shaderfile);
     glShaderSource(context->fragmentShader,1,&temp,NULL);
+    glError = glGetError();
     glCompileShader(context->fragmentShader);
+    glError = glGetError();
+    if(glError != 0)
+    {
+        strcpy(logbuff,"\n the fragment shader has failed to initalize \n");
+        consoleLog();
+        logFileAppend();
+    }
     shaderChecker(context->fragmentShader);
     free(temp);
 }
 void enableShaderContext(struct shaderContext * context)
 {
+    int glError=0;
     glAttachShader(context->program,context->fragmentShader);
+    glError = glGetError();
     glAttachShader(context->program,context->vertexShader);
+    glError = glGetError();
     glLinkProgram(context->program);
+    glError = glGetError();
+    if(glError != 0)
+    {
+        strcpy(logbuff,"\n the enabling of shader context has failed \n");
+        consoleLog();
+        logFileAppend();
+    }
     programChecker(context->program);
 }
 void useShaderContext(struct shaderContext* context)
 {
+    int glError=0;
     glUseProgram(context->program);
+    glError = glGetError();
+    if(glError !=0)
+    {
+        strcpy(logbuff,"\n the apttempt to use the shader context falied \n");
+        consoleLog();
+        logFileAppend();
+    }
 }
 void DeleteShaderContext(struct shaderContext* context)
 {
+    int glError=0;
     glDeleteShader(context->fragmentShader);
     glDeleteShader(context->vertexShader);
     glDeleteProgram(context->program);
+    glError = glGetError();
+    if(glError != 0)
+    {
+        strcpy(logbuff,"\n the deletion of the shader failed \n");
+        consoleLog();
+        logFileAppend();
+    }
     free(context);
 }
 struct shaderContext* CreateContext()
