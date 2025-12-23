@@ -14,7 +14,7 @@
                 "--debug-brk"
             ],
             "stopAtEntry": false,
-            "cwd": "${fileDirname}",
+            "cwd": "${workspaceFolder}",
             "environment": [
                 {
                     "name": "config",

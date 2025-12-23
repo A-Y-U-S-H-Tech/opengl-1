@@ -1,38 +1,55 @@
-
-
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <custom/shader.h>
+#include <custom/loger.h>
+#include <custom/vertex.h>
+#include <string.h>
 #include <stdio.h>
+#include <custom/grid.h>
+#define STB_IMAGE_IMPLEMENTATION
+#include <external/stdb_image.h>//this library uses math.h as a dependency
+
+void callback1(struct vertexContext*);
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow *window);
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
 
-// settings
-const unsigned int SCR_WIDTH = 800;
-const unsigned int SCR_HEIGHT = 600;
+struct textureCoordOfCell t1={0,0,0.0375,0,0.0375,0.06696428571,0,0.06696428571};
+struct textureCoordOfCell t2={0,0,0,0,0,0,0,0};
 
-const char *vertexShaderSource = "#version 330 core\n"
-    "layout (location = 0) in vec3 aPos;\n"
-    "void main()\n"
-    "{\n"
-    "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
-    "}\0";
-const char *fragmentShaderSource = "#version 330 core\n"
-    "out vec4 FragColor;\n"
-    "void main()\n"
-    "{\n"
-    "   FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
-    "}\n\0";
+float MatrixCoordniates[4]=
+{
+    2.0f,-2.0f,2.0f,2.0f
+};
+
+void moveTest(const struct Grid* grid,int* cell,int* prevCell,struct vertexContext* context)
+{
+    if(*prevCell != *cell)
+    {
+        SetCell(grid,t2,*prevCell);
+        SetCell(grid,t1,*cell);
+        gridUpdate(context,grid,*prevCell);
+        gridUpdate(context,grid,*cell);
+    };
+    *prevCell = *cell;
+}
+
+int C;
 
 int main()
 {
+    int SCR_HEIGHT = 600;
+    int SCR_WIDTH = 600;  
     // glfw: initialize and configure
     // ------------------------------
+    glfwInitHint(GLFW_PLATFORM,GLFW_PLATFORM_WAYLAND);
+    glfwInitHint(GLFW_WAYLAND_LIBDECOR,GLFW_WAYLAND_DISABLE_LIBDECOR);//libedocr add lag resize that is why it is disabled
     glfwInit();
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 4);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
 
 #ifdef __APPLE__
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
@@ -48,7 +65,9 @@ int main()
         return -1;
     }
     glfwMakeContextCurrent(window);
+    glfwSwapInterval(1);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+    glfwSetKeyCallback(window, key_callback);
 
     // glad: load all OpenGL function pointers
     // ---------------------------------------
@@ -57,111 +76,62 @@ int main()
         printf("Failed to initialize GLAD" );
         return -1;
     }
+    int width1, height1;
+    glfwGetFramebufferSize(window, &width1, &height1);
 
-
-    // build and compile our shader program
-    // ------------------------------------
-    // vertex shader
-    // unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
-    // glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
-    // glCompileShader(vertexShader);
-    // // check for shader compile errors
-    int success;
-    char infoLog[512];
-    // glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-    // if (!success)
-    // {
-    //     glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-    //     printf("ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" );
-    // }
-    // // fragment shader
-    // unsigned int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-    // glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
-    // glCompileShader(fragmentShader);
-    // // check for shader compile errors
-    // glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
-    // if (!success)
-    // {
-    //     glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
-    //     printf("ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" );
-    // }
-    // // link shaders
-    // unsigned int shaderProgram = glCreateProgram();
-    // glAttachShader(shaderProgram, vertexShader);
-    // glAttachShader(shaderProgram, fragmentShader);
-    // glLinkProgram(shaderProgram);
-    // // check for linking errors
-    // glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
-    // if (!success) {
-    //     glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
-    //     printf("ERROR::SHADER::PROGRAM::LINKING_FAILED\n");
-    // }
-    // glDeleteShader(vertexShader);
-    // glDeleteShader(fragmentShader);
+    glViewport(0, 0, width1,  height1);
     struct shaderContext* a = CreateContext();
-    vShader(a,"/home/ayush/Documents/C/opengl-1/data/shader/vertex.vs");
-    fShader(a,"/home/ayush/Documents/C/opengl-1/data/shader/fragment.fs");
+
+
+    vShader(a,"data/shader/vertex.vs");
+    fShader(a,"data/shader/fragment.fs");
     enableShaderContext(a);
-    glLinkProgram(a->program);
-    // check for linking errors
-    glGetShaderiv(a->fragmentShader, GL_COMPILE_STATUS, &success);
-    if (!success)
-    {
-        glGetShaderInfoLog(a->fragmentShader, 512, NULL, infoLog);
-        printf("ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n %s",infoLog );
-    }
 
-
-    glGetProgramiv(a->program, GL_LINK_STATUS, &success);
-    if (!success) {
-        glGetProgramInfoLog(a->program, 512, NULL, infoLog);
-        printf("ERROR::SHADER::PROGRAM::LINKING_FAILED\n");
-    }
 
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------
-    float vertices[] = {
-         0.5f,  0.5f, 0.0f,  // top right
-         0.5f, -0.5f, 0.0f,  // bottom right
-        -0.5f, -0.5f, 0.0f,  // bottom left
-        -0.5f,  0.5f, 0.0f   // top left 
-    };
-    unsigned int indices[] = {  // note that we start from 0!
-        0, 1, 3,  // first Triangle
-        1, 2, 3   // second Triangle
-    };
-    unsigned int VBO, VAO, EBO;
-    glGenVertexArrays(1, &VAO);
-    glGenBuffers(1, &VBO);
-    glGenBuffers(1, &EBO);
-    // bind the Vertex Array Object first, then bind and set vertex buffer(s), and then configure vertex attributes(s).
-    glBindVertexArray(VAO);
-
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(0);
-
-    // note that this is allowed, the call to glVertexAttribPointer registered VBO as the vertex attribute's bound vertex buffer object so afterwards we can safely unbind
-    glBindBuffer(GL_ARRAY_BUFFER, 0); 
-
-    // remember: do NOT unbind the EBO while a VAO is active as the bound element buffer object IS stored in the VAO; keep the EBO bound.
-    //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
-    // You can unbind the VAO afterwards so other VAO calls won't accidentally modify this VAO, but this rarely happens. Modifying other
-    // VAOs requires a call to glBindVertexArray anyways so we generally don't unbind VAOs (nor VBOs) when it's not directly necessary.
-    glBindVertexArray(0); 
-
-
-    // uncomment this call to draw in wireframe polygons.
-    //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-
+    struct vertexContext v1;
+    const struct Grid * g1 = CreateGrid((float)SCR_WIDTH,(float)SCR_HEIGHT,100.0f,100.0f);
+    
+    for(int i=0;i<g1->numberOfCells;i++)
+    {
+        SetCell(g1,t1,i);
+    }
+    
+   
+    int size = sizeof(struct vertex)*4*(g1->numberOfCells);
+    int numberOfIndices = 6*(g1->numberOfCells);
+     //printf("the size of cells is %d/n",size);
+    initiliseVertexContext(&v1,size,(g1->cells),GL_STATIC_DRAW,callback1,sizeof(unsigned int)*numberOfIndices,g1->indices);
+    glFinish();
+    glFlush();
+    free(g1->cells);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);  
+    //Image and texture loading
+    int width,height, nrChannels;
+    stbi_set_flip_vertically_on_load(0);  
+    unsigned char *data = stbi_load("data/image/GRASS+.png",&width,&height,&nrChannels,0 );
+    unsigned int texture;
+    glGenTextures(1,&texture);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D,texture);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);	
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexImage2D(GL_TEXTURE_2D,0,GL_RGB,width,height,0,GL_RGBA,GL_UNSIGNED_BYTE,data);
+    //glGenerateMipmap(GL_TEXTURE_2D);
+    //printf("error %d",glGetError());
+    useShaderContext(a);
     // render loop
     // -----------
+    // uncomment this call to draw in wireframe polygons.
+    //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    int r=0,b=1;
+
+
+    useShaderContext(a);
     while (!glfwWindowShouldClose(window))
     {
         // input
@@ -174,24 +144,35 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT);
 
         // draw our first triangle
-        enableShaderContext(a);
-        glBindVertexArray(VAO); // seeing as we only have a single VAO there's no need to bind it every time, but we'll do so to keep things a bit more organized
-        //glDrawArrays(GL_TRIANGLES, 0, 6);
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        
+        // glBindVertexArray(VAO); // seeing as we only have a single VAO there's no need to bind it every time, but we'll do so to keep things a bit more organized
+        enableVertextContext(&v1);
+        //glDrawArrays(GL_TRIANGLES, 0, g1->numberOfCells);
+        glDrawElements(GL_TRIANGLES, numberOfIndices, GL_UNSIGNED_INT, 0);
         // glBindVertexArray(0); // no need to unbind it every time 
+        if(C ==1)
+        {
+            moveTest(g1,&b,&r,&v1);
+            b++;
+            C=0;
+        }
+
  
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
+        gllog();
         glfwSwapBuffers(window);
         glfwPollEvents();
+
     }
 
     // optional: de-allocate all resources once they've outlived their purpose:
     // ------------------------------------------------------------------------
-    glDeleteVertexArrays(1, &VAO);
-    glDeleteBuffers(1, &VBO);
-    glDeleteBuffers(1, &EBO);
+    deleteVertexContext(&v1);
     DeleteShaderContext(a);
+    GridTerminate(g1);
+    free(data);
+    glDeleteTextures(1,&texture);
     // glfw: terminate, clearing all previously allocated GLFW resources.
     // ------------------------------------------------------------------
     glfwTerminate();
@@ -200,10 +181,23 @@ int main()
 
 // process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
 // ---------------------------------------------------------------------------------------------------------
+void callback1(struct vertexContext* context)
+{
+    enableVertextContext(context);
+    glVertexAttribPointer(0,3,GL_FLOAT,GL_FALSE,sizeof(struct vertex),(void*)0);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(1,2,GL_FLOAT,GL_FALSE,sizeof(struct vertex),(void*)(sizeof(struct position)));
+    glEnableVertexAttribArray(1);
+}
 void processInput(GLFWwindow *window)
 {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, 1);
+    // if(glfwGetKey(window,GLFW_KEY_D) && C!=1)
+    // {
+    //     printf("\nmoved\n");
+    //     C=1;
+    // }
 }
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes
@@ -215,3 +209,13 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
     glViewport(0, 0, width, height);
 }
 
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
+{
+    if(action == GLFW_RELEASE)
+    {
+        if(key==GLFW_KEY_D)
+        {
+            C=1;
+        }
+    }
+}
