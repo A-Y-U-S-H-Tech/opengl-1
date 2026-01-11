@@ -1,5 +1,6 @@
 #include <custom/grid.h>
 #include <custom/vertex.h>
+#include <custom/Sprite.h>
 #include <stdlib.h>
 #include <stdio.h>
 
@@ -15,10 +16,10 @@ const struct Grid* CreateGrid(float width,float height,float cellHeight,float ce
     tempGrid->indices= tempIndices;
     tempGrid->numberOfCells = size;
     tempGrid->fristIndexPointer = temp;
-    float normHeight = (cellHeight/height)*2,normWidth = (cellWidth/width)*2;
+    float normHeight = (cellHeight),normWidth = (cellWidth);
     int MAXxFaux= width/cellWidth;
     int MAXyFaux= height/cellHeight;
-    float xbias=1,ybias=1;
+    float xbias=width/2,ybias=height/2;
     int x=0,y=0;
     int k=0;
     while (k < size)
@@ -66,7 +67,7 @@ const struct Grid* CreateGrid(float width,float height,float cellHeight,float ce
 
     return tempGrid;
 }
-void SetCell(const struct Grid* grid,const struct textureCoordOfCell texCoord,const unsigned int cellNO)
+void SetCell(const struct Grid* grid,spriteCordinates texCoord,const unsigned int cellNO)
 {
     grid->cells[cellNO].vert1.tex.x=texCoord.texCoord[0].x;
     grid->cells[cellNO].vert1.tex.y=texCoord.texCoord[0].y;
@@ -91,5 +92,6 @@ void GridTerminate(const struct Grid* grid)
 {
     
     free(grid->indices);
+    free(grid->cells);
     free(grid);
 }

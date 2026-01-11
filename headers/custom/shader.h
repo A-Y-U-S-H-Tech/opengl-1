@@ -1,5 +1,5 @@
 //all the function for shader 
-
+#pragma once
 struct shaderContext
 {
     unsigned int vertexShader;

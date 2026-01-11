@@ -1,6 +1,7 @@
 /*
 this defines  logging tools for both the program and opengl functions
 */
+#pragma once
 #include <stdio.h>
 
 extern char logbuff[];//buffer to store the log message

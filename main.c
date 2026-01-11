@@ -9,38 +9,37 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include <external/stdb_image.h>//this library uses math.h as a dependency
 
+#include <custom/Sprite.h>
+#include <custom/Matrix.h>
+
+#include <unistd.h>
+#include <math.h>
+
+#include <custom/ui/text.h>
+
+#include <freetype2/ft2build.h>
+#include FT_FREETYPE_H
+
 void callback1(struct vertexContext*);
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow *window);
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
 
-struct textureCoordOfCell t1={0,0,0.0375,0,0.0375,0.06696428571,0,0.06696428571};
-struct textureCoordOfCell t2={0,0,0,0,0,0,0,0};
+struct spriteCordinates t1,t2;
 
 float MatrixCoordniates[4]=
 {
     2.0f,-2.0f,2.0f,2.0f
 };
+int SCR_HEIGHT = 32*20;
+int SCR_WIDTH = 32*40;  
 
-void moveTest(const struct Grid* grid,int* cell,int* prevCell,struct vertexContext* context)
-{
-    if(*prevCell != *cell)
-    {
-        SetCell(grid,t2,*prevCell);
-        SetCell(grid,t1,*cell);
-        gridUpdate(context,grid,*prevCell);
-        gridUpdate(context,grid,*cell);
-    };
-    *prevCell = *cell;
-}
-
-int C;
+int C=0;
 
 int main()
 {
-    int SCR_HEIGHT = 600;
-    int SCR_WIDTH = 600;  
+
     // glfw: initialize and configure
     // ------------------------------
     glfwInitHint(GLFW_PLATFORM,GLFW_PLATFORM_WAYLAND);
@@ -91,10 +90,30 @@ int main()
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------
     struct vertexContext v1;
-    const struct Grid * g1 = CreateGrid((float)SCR_WIDTH,(float)SCR_HEIGHT,100.0f,100.0f);
-    
+    const struct Grid * g1 = CreateGrid((float)width1,(float)height1,64.0f,64.0f);
+  
+    spriteParameter p1 ={16.00000000f,16.00000000f};
+    SpriteSheetContext ss = SetSpriteSheet("data/image/GRASS+.png",p1);
+    t1 = GetSprite(ss,0);
+    t2 = GetSprite(ss,0);
+
     for(int i=0;i<g1->numberOfCells;i++)
     {
+            SetCell(g1,t2,i);
+    }
+    t2 = GetSprite(ss,0);
+    for(int i=0;i<g1->numberOfCells;i++)
+    {
+        if(i%2==0)
+        {
+            SetCell(g1,t2,i);
+            continue;
+        }
+        if(i%5==0)
+        {
+            SetCell(g1,GetSprite(ss,0),i);
+            continue;
+        }
         SetCell(g1,t1,i);
     }
     
@@ -103,61 +122,79 @@ int main()
     int numberOfIndices = 6*(g1->numberOfCells);
      //printf("the size of cells is %d/n",size);
     initiliseVertexContext(&v1,size,(g1->cells),GL_STATIC_DRAW,callback1,sizeof(unsigned int)*numberOfIndices,g1->indices);
-    glFinish();
-    glFlush();
-    free(g1->cells);
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);  
-    //Image and texture loading
-    int width,height, nrChannels;
-    stbi_set_flip_vertically_on_load(0);  
-    unsigned char *data = stbi_load("data/image/GRASS+.png",&width,&height,&nrChannels,0 );
-    unsigned int texture;
-    glGenTextures(1,&texture);
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D,texture);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);	
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexImage2D(GL_TEXTURE_2D,0,GL_RGB,width,height,0,GL_RGBA,GL_UNSIGNED_BYTE,data);
-    //glGenerateMipmap(GL_TEXTURE_2D);
-    //printf("error %d",glGetError());
+
     useShaderContext(a);
+
+    useSpriteSheet(ss,*a,"ourTexture");
+
+    struct Matrix3x3 projMAtrix=ScreenProjection(SCR_WIDTH,SCR_HEIGHT);
+    projMAtrix=ScreenProjection(width1,height1);
+    glUniformMatrix3fv(glGetUniformLocation(a->program,"transform"),1,GL_FALSE,GetMatrix3x3Pointer(&projMAtrix));
+    struct Matrix4x4 rot = Rotatez(0.0f/180.0f*22.0f/7.0f);
+    glUniformMatrix4fv(glGetUniformLocation(a->program,"rotation"),1,GL_FALSE,GetMatrix4x4Pointer(&rot));
     // render loop
     // -----------
     // uncomment this call to draw in wireframe polygons.
-    //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    //glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
     int r=0,b=1;
-
+    
 
     useShaderContext(a);
+    // glfwSetTime(0.00111);
+    // double initalTime = glfwGetTime();
+    // double finalTime = 0;
+    // double frame=0;
+    char s[] ="email:- ayush@gmail.com";
+    char s2[] = "(!~!)";
+    struct CharectorCollection*  cc1 = CreateCharectorCollection(30,"data/shader/text.vs","data/shader/text.fs",1,"data/font/arial/ARIAL.TTF",120);
+    RenderText(cc1);
+    CreateStaticText(cc1,0.0f,0.0f,s,sizeof(s));
+    CreateStaticText(cc1,-500.0f,200.0f,s2,sizeof(s2));
+    RenderText(cc1);
+    glUniformMatrix3fv(glGetUniformLocation(cc1->scontext->program,"transform"),1,GL_FALSE,GetMatrix3x3Pointer(&projMAtrix));
+    glUniform1i(glGetUniformLocation(cc1->scontext->program,"ourTexture"),1);
+
+
     while (!glfwWindowShouldClose(window))
     {
         // input
-        // -----
+        // -----  
+        // if(C ==1)
+        // {
+        //     projMAtrix=ScreenProjection(SCR_WIDTH,SCR_HEIGHT);
+        //     glUniformMatrix3fv(glGetUniformLocation(a->program,"transform"),1,GL_FALSE,GetMatrix3x3Pointer(&projMAtrix));
+        //     C =0;
+        // }
         processInput(window);
 
         // render
         // ------
-        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+        glClearColor(1.0f, 0.0f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
         // draw our first triangle
         
         // glBindVertexArray(VAO); // seeing as we only have a single VAO there's no need to bind it every time, but we'll do so to keep things a bit more organized
+        glDisable(GL_BLEND);
+        useShaderContext(a);
         enableVertextContext(&v1);
+        //glPixelStorei(GL_UNPACK_ALIGNMENT,4);
+        glActiveTexture(GL_TEXTURE0);
         //glDrawArrays(GL_TRIANGLES, 0, g1->numberOfCells);
         glDrawElements(GL_TRIANGLES, numberOfIndices, GL_UNSIGNED_INT, 0);
+        RenderText(cc1);
+        glDrawElements(GL_TRIANGLES, cc1->size*6, GL_UNSIGNED_INT,0);
         // glBindVertexArray(0); // no need to unbind it every time 
-        if(C ==1)
-        {
-            moveTest(g1,&b,&r,&v1);
-            b++;
-            C=0;
-        }
+        // if(C ==1)
+        // {
+        //     moveTest(g1,&b,&r,&v1);
+        //     b++;
+        //     C=0;
+        // }
+        // useShaderContext(s1);
+        // enableVertextContext(&v1);
+        // glDrawElements(GL_TRIANGLES,6,GL_UNSIGNED_INT,0);
 
- 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
         gllog();
@@ -171,13 +208,29 @@ int main()
     deleteVertexContext(&v1);
     DeleteShaderContext(a);
     GridTerminate(g1);
-    free(data);
-    glDeleteTextures(1,&texture);
+    DeleteSpriteSheet(ss);
     // glfw: terminate, clearing all previously allocated GLFW resources.
     // ------------------------------------------------------------------
+    DeleteCollection(cc1);
     glfwTerminate();
     return 0;
 }
+
+
+
+void callback(struct vertexContext* context)
+{
+    enableVertextContext(context);
+    glVertexAttribPointer(0,3,GL_FLOAT,GL_FALSE,sizeof(struct charectorVertex),(void*)0);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(1,3,GL_FLOAT,GL_FALSE,sizeof(struct charectorVertex),(void*)(sizeof(float)*3));
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(2,4,GL_FLOAT,GL_FALSE,sizeof(struct charectorVertex),(void*)(sizeof(float)*6));
+    glEnableVertexAttribArray(2);
+}
+
+
+
 
 // process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
 // ---------------------------------------------------------------------------------------------------------
@@ -207,6 +260,9 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
     // make sure the viewport matches the new window dimensions; note that width and 
     // height will be significantly larger than specified on retina displays.
     glViewport(0, 0, width, height);
+    SCR_HEIGHT = height;
+    SCR_WIDTH = width;
+    C = 1 ;
 }
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
@@ -215,7 +271,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
     {
         if(key==GLFW_KEY_D)
         {
-            C=1;
+            
         }
     }
 }

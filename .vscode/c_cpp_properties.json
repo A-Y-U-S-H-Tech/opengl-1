@@ -12,7 +12,15 @@
             "compilerPath": "/usr/bin/clang",
             "cStandard": "c17",
             "cppStandard": "c++17",
-            "intelliSenseMode": "linux-clang-x64"
+            "intelliSenseMode": "linux-clang-x64",
+            "compilerArgs": [
+                "-I/usr/include/freetype2 ",
+                "-I/usr/include/libpng16 -DWITH_GZFILEOP ",
+                "-I/usr/include/harfbuzz -I/usr/include/glib-2.0 ",
+                "-I/usr/lib64/glib-2.0/include ",
+                "-I/usr/include/sysprof-6 ",
+                "-pthread"
+            ]
         }
     ],
     "version": 4
