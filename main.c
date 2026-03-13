@@ -1,24 +1,24 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-#include <custom/shader.h>
-#include <custom/loger.h>
-#include <custom/vertex.h>
 #include <string.h>
 #include <stdio.h>
-#include <custom/grid.h>
-#define STB_IMAGE_IMPLEMENTATION
-#include <external/stdb_image.h>//this library uses math.h as a dependency
-
-#include <custom/Sprite.h>
-#include <custom/Matrix.h>
-
 #include <unistd.h>
 #include <math.h>
 
+#define STB_IMAGE_IMPLEMENTATION
+#include <external/stdb_image.h>//this library uses math.h as a dependency
+
+#include <custom/shader.h>
+#include <custom/loger.h>
+#include <custom/ui/color.h>
+#include <custom/vertex.h>
+#include <custom/grid.h>
+#include <custom/Sprite.h>
+#include <custom/Matrix.h>
 #include <custom/ui/text.h>
 
-#include <freetype2/ft2build.h>
-#include FT_FREETYPE_H
+
+
 
 void callback1(struct vertexContext*);
 
@@ -145,11 +145,11 @@ int main()
     // double finalTime = 0;
     // double frame=0;
     char s[] ="email:- ayush@gmail.com";
-    char s2[] = "(!~!)";
-    struct CharectorCollection*  cc1 = CreateCharectorCollection(30,"data/shader/text.vs","data/shader/text.fs",1,"data/font/arial/ARIAL.TTF",120);
+    char s2[] = "(!&**!)";
+    struct CharectorCollection*  cc1 = CreateCharectorCollection(50,"data/shader/text.vs","data/shader/text.fs",1,"data/font/arial/ARIAL.TTF",120);
     RenderText(cc1);
-    CreateStaticText(cc1,0.0f,0.0f,s,sizeof(s));
-    CreateStaticText(cc1,-500.0f,200.0f,s2,sizeof(s2));
+    CreateStaticText(cc1,-500.0f,0.0f,s,sizeof(s),COLOR_PALE_PINK);
+    CreateStaticText(cc1,-500.0f,200.0f,s2,sizeof(s2),COLOR_BLUE);
     RenderText(cc1);
     glUniformMatrix3fv(glGetUniformLocation(cc1->scontext->program,"transform"),1,GL_FALSE,GetMatrix3x3Pointer(&projMAtrix));
     glUniform1i(glGetUniformLocation(cc1->scontext->program,"ourTexture"),1);
@@ -159,12 +159,13 @@ int main()
     {
         // input
         // -----  
-        // if(C ==1)
-        // {
-        //     projMAtrix=ScreenProjection(SCR_WIDTH,SCR_HEIGHT);
-        //     glUniformMatrix3fv(glGetUniformLocation(a->program,"transform"),1,GL_FALSE,GetMatrix3x3Pointer(&projMAtrix));
-        //     C =0;
-        // }
+        if(C ==1)
+        {
+            projMAtrix=ScreenProjection(SCR_WIDTH,SCR_HEIGHT);
+            glUniformMatrix3fv(glGetUniformLocation(a->program,"transform"),1,GL_FALSE,GetMatrix3x3Pointer(&projMAtrix));
+            glUniformMatrix3fv(glGetUniformLocation(cc1->scontext->program,"transform"),1,GL_FALSE,GetMatrix3x3Pointer(&projMAtrix));
+            C =0;
+        }
         processInput(window);
 
         // render

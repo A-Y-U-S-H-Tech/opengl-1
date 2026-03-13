@@ -23,7 +23,7 @@
             ],
             
             "logging": {
-                "moduleLoad": true,
+                "moduleLoad": false,
                 "trace": false
             },
             "externalConsole": false,

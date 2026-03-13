@@ -1,4 +1,5 @@
 #include <custom/ui/text.h>
+#include <custom/ui/color.h>
 #include <freetype2/ft2build.h>
 #include <glad/glad.h>
 #include FT_FREETYPE_H
@@ -34,13 +35,16 @@ static void calllback(struct vertexContext* context)
 }
 
 
-void CreateStaticText(struct CharectorCollection* collection,float x,float y,const char* text,int textSize)
+void CreateStaticText(struct CharectorCollection* collection,float x,float y,const char* text,int textSize,struct color color)
 {
     const int size = collection->size;
     float X=x;
     float Y=y;
+    float Color[4]; 
+    ColorNormalizer(color,Color);
     for(int i=0;i<textSize-1;i++)
     {
+        Y+=(collection->charectors[text[i]].bearing.B-collection->charectors[text[i]].size.B);
         collection->Quad[i+size].v1.m_pos.x = X;
         collection->Quad[i+size].v1.m_pos.y = Y;
         collection->Quad[i+size].v1.m_pos.z = 0;
@@ -48,6 +52,11 @@ void CreateStaticText(struct CharectorCollection* collection,float x,float y,con
         collection->Quad[i+size].v1.m_texcoord.x = 0;
         collection->Quad[i+size].v1.m_texcoord.y = collection->charectors[text[i]].size.B/maxHeight;
         collection->Quad[i+size].v1.m_texcoord.z = text[i];
+
+        collection->Quad[i+size].v1.m_color.r= Color[0];
+        collection->Quad[i+size].v1.m_color.b = Color[1];
+        collection->Quad[i+size].v1.m_color.g= Color[2];
+        collection->Quad[i+size].v1.m_color.alpha = Color[3];
 
         
         collection->Quad[i+size].v2.m_pos.x = X+collection->charectors[text[i]].size.A;
@@ -58,6 +67,11 @@ void CreateStaticText(struct CharectorCollection* collection,float x,float y,con
         collection->Quad[i+size].v2.m_texcoord.y = collection->charectors[text[i]].size.B/maxHeight;
         collection->Quad[i+size].v2.m_texcoord.z = text[i];
 
+        collection->Quad[i+size].v2.m_color.r= Color[0];
+        collection->Quad[i+size].v2.m_color.b = Color[1];
+        collection->Quad[i+size].v2.m_color.g= Color[2];
+        collection->Quad[i+size].v2.m_color.alpha = Color[3];
+
 
         collection->Quad[i+size].v3.m_pos.x = X+collection->charectors[text[i]].size.A;
         collection->Quad[i+size].v3.m_pos.y = Y+collection->charectors[text[i]].size.B;
@@ -67,6 +81,11 @@ void CreateStaticText(struct CharectorCollection* collection,float x,float y,con
         collection->Quad[i+size].v3.m_texcoord.y = 0;
         collection->Quad[i+size].v3.m_texcoord.z = text[i];
 
+        collection->Quad[i+size].v3.m_color.r= Color[0];
+        collection->Quad[i+size].v3.m_color.b = Color[1];
+        collection->Quad[i+size].v3.m_color.g= Color[2];
+        collection->Quad[i+size].v3.m_color.alpha = Color[3];
+
         collection->Quad[i+size].v4.m_pos.x = X;
         collection->Quad[i+size].v4.m_pos.y = Y+collection->charectors[text[i]].size.B;
         collection->Quad[i+size].v4.m_pos.z = 0;
@@ -75,13 +94,19 @@ void CreateStaticText(struct CharectorCollection* collection,float x,float y,con
         collection->Quad[i+size].v4.m_texcoord.y = 0;
         collection->Quad[i+size].v4.m_texcoord.z = text[i];
 
+        collection->Quad[i+size].v4.m_color.r= Color[0];
+        collection->Quad[i+size].v4.m_color.b = Color[1];
+        collection->Quad[i+size].v4.m_color.g= Color[2];
+        collection->Quad[i+size].v4.m_color.alpha = Color[3];
+
         collection->indices[0+6*i+size] = 0+4*i;//3
         collection->indices[1+6*i+size] = 1+4*i;//0
         collection->indices[2+6*i+size] = 2+4*i;//2
         collection->indices[3+6*i+size] = 3+4*i;//0
         collection->indices[4+6*i+size] = 0+4*i;
         collection->indices[5+6*i+size] = 2+4*i;
-        X+=collection->charectors[text[i]].size.A;
+        X+=collection->charectors[text[i]].Advance>>6;
+        Y-=(collection->charectors[text[i]].bearing.B-collection->charectors[text[i]].size.B);
     }
     collection->size+=textSize-1;
     subVBOUpdate(collection->vcontext,sizeof(struct CharectorQuad)*size,sizeof(struct CharectorQuad)*textSize,&collection->Quad[size]);

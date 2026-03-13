@@ -86,6 +86,11 @@ void gridUpdate(struct vertexContext* context,const struct Grid* grid,unsigned i
     int offset = sizeof(struct Cell)*(cellNO);
     int size = sizeof(struct Cell);
     void * data = (void*)(grid->fristIndexPointer);
+    if(data == NULL)
+    {
+        printf("Invalid SubBuffer Modification Data Pointer NULL");
+        return;
+    }
     subVBOUpdate(context,offset,size,data+offset);
 }
 void GridTerminate(const struct Grid* grid)

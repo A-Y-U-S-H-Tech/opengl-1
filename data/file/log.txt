@@ -80,3 +80,7 @@ error: linking with uncompiled/unspecialized shader
 0:13(2): error: value of type vec4 cannot be assigned to variable of type error
 
 error: linking with uncompiled/unspecialized shader
+
+ the upldation of data to sub buffer failed 
+
+ the upldation of data to sub buffer failed 
