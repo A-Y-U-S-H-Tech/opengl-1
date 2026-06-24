@@ -2,9 +2,14 @@
     "version": "2.0.0",
     "tasks": [
         {
+            "label": "environment Stting",
+            "command":"set debuginfod enabled off"
+        },
+        {
             "label": "opengl",
             "type": "shell",
             "command": "make",
+            "dependsOn":["environment stting"],
             "group": {
                 "kind": "build",
                 "isDefault": true

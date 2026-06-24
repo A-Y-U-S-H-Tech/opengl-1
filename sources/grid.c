@@ -3,7 +3,8 @@
 #include <custom/Sprite.h>
 #include <stdlib.h>
 #include <stdio.h>
-
+#include <custom/loger.h>
+#include <custom/DataStructure/Queue.h>
 
 
 const struct Grid* CreateGrid(float width,float height,float cellHeight,float cellWidth)//cellHeight and Widht are not normalized and are relative to widht and height of the grid
@@ -64,11 +65,16 @@ const struct Grid* CreateGrid(float width,float height,float cellHeight,float ce
         }
     }
 
-
+    enQueue(&LogQueue,"\nthe Grid is created Successfully\n");
     return tempGrid;
 }
 void SetCell(const struct Grid* grid,spriteCordinates texCoord,const unsigned int cellNO)
 {
+    if(grid == NULL){
+        printf("Invaild Grid\n");
+        enQueue(&LogQueue,"\nInvalid Grid it is NULL\n");
+        return;
+    }
     grid->cells[cellNO].vert1.tex.x=texCoord.texCoord[0].x;
     grid->cells[cellNO].vert1.tex.y=texCoord.texCoord[0].y;
     
@@ -83,11 +89,17 @@ void SetCell(const struct Grid* grid,spriteCordinates texCoord,const unsigned in
 }
 void gridUpdate(struct vertexContext* context,const struct Grid* grid,unsigned int cellNO)//Should be called only after inilization of the vertex Context
 {
+    if(grid == NULL)
+    {
+        printf("Not Valid Grid\n");
+        return;
+    }
     int offset = sizeof(struct Cell)*(cellNO);
     int size = sizeof(struct Cell);
     void * data = (void*)(grid->fristIndexPointer);
     if(data == NULL)
     {
+        enQueue(&LogQueue,"\n the grid buffer is invalid\n");
         printf("Invalid SubBuffer Modification Data Pointer NULL");
         return;
     }
@@ -95,7 +107,11 @@ void gridUpdate(struct vertexContext* context,const struct Grid* grid,unsigned i
 }
 void GridTerminate(const struct Grid* grid)
 {
-    
+    if(grid == NULL){
+        enQueue(&LogQueue,"\nGrid Not valid\n");
+        printf("Grid Not valid\n");
+        return;
+    }
     free(grid->indices);
     free(grid->cells);
     free(grid);

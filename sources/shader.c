@@ -4,6 +4,7 @@
 #include <glad/glad.h>
 #include <string.h>
 #include <custom/loger.h>
+#include <custom/DataStructure/Queue.h>
 
 char* fileload(const char* name)
 {
@@ -11,12 +12,7 @@ char* fileload(const char* name)
     ptr = fopen(name,"r");
     if(ptr == NULL)
     {
-        strcpy(logbuff,"\n the file could not be opended file name: ");
-        strcat(logbuff,name);
-        strcat(logbuff,"\n");
-        logFileAppend();
-        consoleLog();
-        logbuff[0]='\0';
+        enQueue(&LogQueue,"\n the file could not be opended file name: \n");
         exit(1);
     }
     char *file = malloc(sizeof(char)*400);
@@ -35,9 +31,7 @@ void vShader(struct shaderContext* context,char* shaderfile)
     glError = glGetError();
     if(glError != 0) 
     {
-        strcpy(logbuff,"\n the vertex shader initilization has failed \n");
-        consoleLog();
-        logFileAppend();
+        enQueue(&LogQueue,"\n the vertex shader initilization has failed \n");
     }
     shaderChecker(context->vertexShader);
     free(temp);
@@ -52,9 +46,7 @@ void fShader(struct shaderContext* context,char* shaderfile)
     glError = glGetError();
     if(glError != 0)
     {
-        strcpy(logbuff,"\n the fragment shader has failed to initalize \n");
-        consoleLog();
-        logFileAppend();
+        enQueue(&LogQueue,"\n the fragment shader has failed to initalize \n");
     }
     shaderChecker(context->fragmentShader);
     free(temp);
@@ -70,9 +62,7 @@ void enableShaderContext(struct shaderContext * context)
     glError = glGetError();
     if(glError != 0)
     {
-        strcpy(logbuff,"\n the enabling of shader context has failed \n");
-        consoleLog();
-        logFileAppend();
+        enQueue(&LogQueue,"\n the enabling of shader context has failed \n");
     }
     programChecker(context->program);
 }
@@ -83,9 +73,7 @@ void useShaderContext(struct shaderContext* context)
     glError = glGetError();
     if(glError !=0)
     {
-        strcpy(logbuff,"\n the apttempt to use the shader context falied \n");
-        consoleLog();
-        logFileAppend();
+        enQueue(&LogQueue,"\n the apttempt to use the shader context falied \n");
     }
 }
 void DeleteShaderContext(struct shaderContext* context)
@@ -97,9 +85,7 @@ void DeleteShaderContext(struct shaderContext* context)
     glError = glGetError();
     if(glError != 0)
     {
-        strcpy(logbuff,"\n the deletion of the shader failed \n");
-        consoleLog();
-        logFileAppend();
+        enQueue(&LogQueue,"\n the deletion of the shader failed \n");
     }
     free(context);
 }

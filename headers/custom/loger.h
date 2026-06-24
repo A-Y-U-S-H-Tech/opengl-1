@@ -3,8 +3,10 @@ this defines  logging tools for both the program and opengl functions
 */
 #pragma once
 #include <stdio.h>
+#include <custom/DataStructure/Queue.h>
 
 extern char logbuff[];//buffer to store the log message
+extern Queue* LogQueue;
 extern const char defaultfile[];//file to store the logs in
 static FILE* fileptr;
 
@@ -16,3 +18,4 @@ void consoleLogLogerError(char * data);
 //specific function to check error for specific opengl functions
 void shaderChecker(unsigned int shader);
 void programChecker(unsigned int program);
+void executeQueueTask(Queue** q);

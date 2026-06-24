@@ -3,5 +3,6 @@
         "*.c": "c",
         "*.cpp": "c++",
         "shader.h": "c"
-    }
+    },
+    "makefile.configureOnOpen": false
 }

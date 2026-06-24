@@ -1,5 +1,6 @@
 #pragma once
 #include <custom/shader.h>
+#include <custom/vector.h>
 struct spriteParameter
 {
     float height;
@@ -21,12 +22,7 @@ struct SpriteSheetContext
 };
 struct spriteCordinates
 {
-    struct vec2
-    {
-        float x;
-        float y;
-    };
-    struct vec2 texCoord[4];
+    vector2DF texCoord[4];
 };
 typedef  struct SpriteSheetContext  SpriteSheetContext;
 typedef  struct spriteCordinates    spriteCordinates;

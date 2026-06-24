@@ -1,6 +1,8 @@
 #include <custom/Sprite.h>
 #include <custom/shader.h>
 #include <external/stdb_image.h>
+#include <custom/loger.h>
+#include <custom/DataStructure/Queue.h>
 #include <glad/glad.h>
 #include <custom/loger.h>
 #include <stdio.h>
@@ -10,6 +12,7 @@ static void loadImage(ImageContext* img)
 {
     stbi_set_flip_vertically_on_load(1);
     img->data = stbi_load(img->fileName,&(img->width),&(img->height),&(img->nrChannels),0);
+    enQueue(&LogQueue,"\n the Image is loaded for the spirite\n");
 }
 SpriteSheetContext SetSpriteSheet(const char* filename,spriteParameter context)
 {
@@ -39,7 +42,7 @@ SpriteSheetContext SetSpriteSheet(const char* filename,spriteParameter context)
     glGenerateMipmap(GL_TEXTURE_2D);
 
     free(img.data);
-
+    enQueue(&LogQueue,"\n the spriteContext is created\n");
     return spriteContext;
 }
 spriteCordinates GetSprite(SpriteSheetContext context,unsigned int spriteCellNO)
@@ -71,12 +74,12 @@ void useSpriteSheet(SpriteSheetContext context,struct shaderContext shaderContex
     int glError = glGetError();
     if(glError !=0)
     {
-        strcpy(logbuff,"\n the vertex context couldn't be enabled \n");
-        consoleLog();
-        logFileAppend();
+        enQueue(&LogQueue,"\n the vertex context couldn't be enabled \n");
     }
+    enQueue(&LogQueue,"\nthe SpriteSheet is set in use\n");
 }
 void DeleteSpriteSheet(SpriteSheetContext context)
 {
     glDeleteTextures(1,&context.TextureId);
+    enQueue(&LogQueue,"\n the sprite sheet is deleted\n");
 }

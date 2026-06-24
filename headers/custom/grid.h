@@ -1,30 +1,15 @@
 #pragma once
 #include <custom/vertex.h>
 #include <custom/Sprite.h>
+#include <custom/vector.h>
 struct textureCoordOfCell
 {
-    struct vec2
-    {
-        float x;
-        float y;
-    };
-    struct vec2 texCoord[4];
-};
-struct __attribute__((packed))  position
-    {
-        float x;
-        float y;
-        float z;
-    };
-struct __attribute__((packed))  texture
-    {
-        float x;
-        float y;
+    vector2DF texCoord[4];
 };
 struct __attribute__((packed))  vertex
 {
-    struct position pos;
-    struct texture tex;
+    struct vector3DF pos;
+    struct vector2DF tex;
 };
 
 struct __attribute__((packed))  Cell

@@ -4,5 +4,8 @@
 
 vectorND* InitilizeVectorND(int size)
 {
-    return (vectorND*)malloc(sizeof(vectorND));
+    vectorND* tmp =malloc(sizeof(vectorND));
+    tmp->data = malloc(sizeof(int)*size);
+    tmp->size = size;
+    return tmp;
 }

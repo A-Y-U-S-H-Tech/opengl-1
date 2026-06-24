@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <math.h>
+#include <custom/loger.h>
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <external/stdb_image.h>//this library uses math.h as a dependency
@@ -201,7 +202,7 @@ int main()
         gllog();
         glfwSwapBuffers(window);
         glfwPollEvents();
-
+        executeQueueTask(&LogQueue);
     }
 
     // optional: de-allocate all resources once they've outlived their purpose:

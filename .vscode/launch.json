@@ -19,9 +19,12 @@
                 {
                     "name": "config",
                     "value": "Debug"
+                },
+                {
+                 "name": "DEBUGINFOD_URLS",
+                "value": ""
                 }
             ],
-            
             "logging": {
                 "moduleLoad": false,
                 "trace": false
@@ -37,6 +40,11 @@
                 {
                     "description": "Set Disassembly Flavor to Intel",
                     "text": "-gdb-set disassembly-flavor intel",
+                    "ignoreFailures": false
+                },
+                {
+                    "description": "Disable debuginfod",
+                    "text": "set debuginfod enabled off",
                     "ignoreFailures": false
                 }
             ]

@@ -1,9 +1,12 @@
 #include <custom/loger.h>
+#include <custom/DataStructure/Queue.h>
 #include <stdio.h>
 #include <string.h>
 #include <glad/glad.h>
 #include <stdlib.h>
+
 char logbuff[525];
+Queue* LogQueue = NULL;
 const char defaultfile[]="data/file/log.txt";
 
 void consoleLogLogerError(char * data)
@@ -63,5 +66,15 @@ void programChecker(unsigned int program)
         strcat(logbuff,"\n");
         consoleLog();
         logFileAppend();
+    }
+}
+void executeQueueTask(Queue** q)
+{
+    int i = 0;
+    while( i != 5 && (*q)->front != -1)
+    {
+        printf("[Log][Info] \n");
+        printf("%s ",deQueue(q));
+        i++;
     }
 }

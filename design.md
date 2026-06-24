@@ -1,0 +1,48 @@
+# this is a 2D Game Engine written in c
+## goal is to create a graphics libray in c to make 2d games and apps without the constant need to write low level opengl ,image process and display code
+### Major System of the Game Engine
+- Display:-
+    - Vertex
+    - Shader
+    - Texture
+    - Sprite
+    - UI:-
+        - Text
+- Utility:-
+    - Grid System
+    - UI:-
+        - Color
+    - Vector
+    - Matrix
+- Build System
+# Description of all the systems:-
+- Display:-
+    - ALL things Related directly to the process of showing a enity on the screen is covered in the Display System
+    - Subsystems:-
+        - Vertex System:-
+            - ALL things related to the managment of vertex context is here it manages the lifecycle of:-
+                - VBO (vertex Buffer Object)
+                - VAO (vertex Array Object)
+                - EBO (ellement Buffer Object)
+        - Shader System:-
+            - The lifecycle of a shader context the creation,updation & deltion is covered in this system
+    - Texture System:- 
+        - It manages the lifecyle and transformation of a texture Context
+    - Sprite System:-
+        - It mnages the lifecycle of sprite(collection of images) and give the Spritie Contect to integrate it with other things
+    - UI:-
+        - Text:-
+            - It manages the lifecycle of text via vairous text Context and gives them so it can be integrated with other systems / things
+- Utility:- 
+    - Grid Syetem:-
+        - It is Grid Based Batch rendering for things that belong to particular catogory
+        - It gives and manages a grid of verties that are generated based on the dimmension given and can be used by other system to create things on the verties 
+    - UI:-
+        - Color:-
+            - It gives some basic Color and Utility function to get color for other systems easily
+    - Vector:-
+        - Part of Math's System give vectors to perform varies calulation needed for transformation in the engine
+    - Matric :-
+        - Parrt of Math's System give Matrix which help to perform varies calculation needed for transformation in the egine and the gpu side transformation
+- Build Sytem:-
+    - Responsible for compling , linking & dependency handling used to build our app so that it can acullay run.
